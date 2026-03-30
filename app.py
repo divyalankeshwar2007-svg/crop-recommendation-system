@@ -19,17 +19,12 @@ st.markdown(" **Helping the Farmers in Maharashtra to Choose the Best Crop** ")
 
 # saving the files 
 @st.cache_resource
+
 def load_all():
-    with open('rf_model.pkl', 'rb') as f:
-        model = pickle.load(f)
-    
-    with open('le_target.pkl', 'rb') as f:
-        le = pickle.load(f)
-
-    with open('preprocessor.pkl', 'rb') as f:
-        preprocessor = pickle.load(f)
-
-    return model, le, preprocessor
+    rf_model = joblib.load("rf_model.pkl")
+    preprocessor = joblib.load("preprocessor.pkl")
+    le_target = joblib.load("le_target.pkl")
+    return rf_model, le_target, preprocessor
 
 rf_model, le_target, preprocessor = load_all()
 
@@ -69,7 +64,7 @@ crop_images = {
     "apple": "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce",
     "grapes": "https://images.unsplash.com/photo-1596363505729-4190a9506133",
     "orange": "https://images.unsplash.com/photo-1580052614034-c55d20bfee3b",
-    "pigeonpeas": "https://upload.wikimedia.org/wikipedia/commons/0/0c/Pigeon_pea.jpg"
+    "pigeonpeas": "https://upload.wikimedia.org/wikipedia/commons/0/0c/Pigeon_pea.jpg",
 }
 
 # Making a clickable button 
