@@ -1,6 +1,7 @@
 import streamlit as st
 import pickle
 import pandas as pd
+import joblib
 from sklearn.preprocessing import StandardScaler
 from sklearn.compose import ColumnTransformer
 import time
