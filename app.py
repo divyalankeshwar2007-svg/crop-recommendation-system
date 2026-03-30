@@ -1,54 +1,50 @@
 import streamlit as st
-import pickle
 import pandas as pd
 import joblib
-from sklearn.preprocessing import StandardScaler
-from sklearn.compose import ColumnTransformer
 import time
 
-crop_name = None
+# Page config
+st.set_page_config(page_title="Crop Recommendation System", page_icon="🌾", layout="centered")
 
-st.set_page_config(page_title="Crop Recommendation System",page_icon="🌾",layout="centered")
-
+# Banner image
 st.image(
     "https://images.unsplash.com/photo-1500382017468-9049fed747ef",
-    use_container_width=True
+    width="stretch"
 )
 
-st.title(" 🌾 Crop Recommendation System ")
-st.markdown(" **Helping the Farmers in Maharashtra to Choose the Best Crop** ")
+# Title
+st.title("🌾 Crop Recommendation System")
+st.markdown("**Helping the Farmers in Maharashtra to Choose the Best Crop**")
 
-# saving the files 
+# Load model and encoder
 @st.cache_resource
-
 def load_all():
-    rf_model = joblib.load("rf_model.pkl")
-    preprocessor = joblib.load("preprocessor.pkl")
+    model = joblib.load("model.pkl")   # ✅ pipeline model
     le_target = joblib.load("le_target.pkl")
-    return rf_model, le_target, preprocessor
+    return model, le_target
 
-rf_model, le_target, preprocessor = load_all()
+model, le_target = load_all()
 
+# Features
 numeric_features = ['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall']
 
-# Input section 
+# Input section
 st.subheader("Enter the Soil and Weather Conditions")
 
-col1 , col2 , col3 = st.columns(3)
+col1, col2, col3 = st.columns(3)
 
 with col1:
-    N = st.number_input("Nitrogen (N)",0,140,50)
-    P = st.number_input("Phosphorus (P)",0,145,50)
-    K = st.number_input("Potassium (K)",0,205,50)
+    N = st.number_input("Nitrogen (N)", 0, 140, 50)
+    P = st.number_input("Phosphorus (P)", 0, 145, 50)
+    K = st.number_input("Potassium (K)", 0, 205, 50)
 
 with col2:
-    temperature = st.number_input("Temperature (°C)",8.0, 43.0, 25.0)
-    humidity = st.number_input("Humidity (%)",14.0, 100.0, 70.0)
-    ph = st.number_input("pH Value",3.5, 9.9, 6.5)
+    temperature = st.number_input("Temperature (°C)", 8.0, 43.0, 25.0)
+    humidity = st.number_input("Humidity (%)", 14.0, 100.0, 70.0)
+    ph = st.number_input("pH Value", 3.5, 9.9, 6.5)
 
 with col3:
-    rainfall = st.number_input("Rainfall (mm)",20.0, 300.0, 100.0)
-
+    rainfall = st.number_input("Rainfall (mm)", 20.0, 300.0, 100.0)
 
 # Crop images
 crop_images = {
@@ -68,28 +64,27 @@ crop_images = {
     "pigeonpeas": "https://upload.wikimedia.org/wikipedia/commons/0/0c/Pigeon_pea.jpg",
 }
 
-# Making a clickable button 
-if st.button("🌱 Predict Best Crop", type="primary", use_container_width=True):
+# Predict button
+if st.button("🌱 Predict Best Crop", type="primary", width="stretch"):
 
     with st.spinner("🌱 Analyzing soil and weather data..."):
         time.sleep(1)
 
-        input_data = pd.DataFrame([[N, P, K, temperature, humidity, ph, rainfall]],columns=numeric_features)
-
-        input_scaled = preprocessor.transform(input_data)
-
-        prediction = rf_model.predict(input_scaled)
+        input_data = pd.DataFrame(
+            [[N, P, K, temperature, humidity, ph, rainfall]],
+            columns=numeric_features
+        )
+        
+        prediction = model.predict(input_data)
         crop_name = le_target.inverse_transform(prediction)[0]
 
     st.success(f"**Recommended Crop: {crop_name.upper()}** 🌾")
 
     st.markdown("### 🌿 Recommended Crop Preview")
 
-    st.success(f"**Recommended Crop: {crop_name.upper()}** 🌾")
-
     image_url = crop_images.get(crop_name.lower())
 
     if image_url:
-        st.image(image_url, caption=f"🌾 {crop_name.upper()}", use_container_width=True)
+        st.image(image_url, caption=f"🌾 {crop_name.upper()}", width="stretch")
     else:
-        st.image("https://picsum.photos/id/1015/400/300", caption=crop_name.upper(), use_column_width=True)
+        st.image("https://picsum.photos/id/1015/400/300", caption=crop_name.upper(), width="stretch")
