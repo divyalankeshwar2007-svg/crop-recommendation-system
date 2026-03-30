@@ -76,7 +76,7 @@ if st.button("🌱 Predict Best Crop", type="primary", width="stretch"):
         )
         
         prediction = model.predict(input_data)
-        crop_name = le_target.inverse_transform(prediction)[0]
+        crop_name = prediction[0]
 
     st.success(f"**Recommended Crop: {crop_name.upper()}** 🌾")
 
